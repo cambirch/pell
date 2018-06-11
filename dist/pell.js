@@ -167,14 +167,18 @@ var init = function init(settings) {
   actionbar.className = classes.actionbar;
   appendChild(settings.element, actionbar);
 
+  var avoidSafariRecursionBug = false;
   var content = settings.element.content = createElement('div');
   content.contentEditable = true;
   content.className = classes.content;
   content.oninput = function (_ref) {
     var firstChild = _ref.target.firstChild;
 
+    if (avoidSafariRecursionBug) return;
+    avoidSafariRecursionBug = true;
     if (firstChild && firstChild.nodeType === 3) exec(formatBlock, '<' + defaultParagraphSeparator + '>');else if (content.innerHTML === '<br>') content.innerHTML = '';
     settings.onChange(content.innerHTML);
+    avoidSafariRecursionBug = false;
   };
   content.onkeydown = function (event) {
     if (event.key === 'Tab') {
